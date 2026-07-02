@@ -15,7 +15,7 @@ use Filament\Support\Icons\Heroicon;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Model;
 use UnitEnum;
-use Illuminate\Support\Facades\Auth;
+
 class HasilOptimasiResource extends Resource
 {
     protected static ?string $model = HasilOptimasi::class;
@@ -36,32 +36,32 @@ class HasilOptimasiResource extends Resource
 
     public static function canViewAny(): bool
     {
-        return Auth::user()?->canViewOptimizationData() ?? false;
+        return auth()->user()?->canViewOptimizationData() ?? false;
     }
 
     public static function canView(Model $record): bool
     {
-        return Auth::user()?->canViewOptimizationData() ?? false;
-    } 
+        return auth()->user()?->canViewOptimizationData() ?? false;
+    }
 
     public static function canCreate(): bool
     {
-        return Auth::user()?->canManageOptimizationData() ?? false;
+        return auth()->user()?->canManageOptimizationData() ?? false;
     }
 
     public static function canEdit(Model $record): bool
     {
-        return Auth::user()?->canManageOptimizationData() ?? false;
+        return auth()->user()?->canManageOptimizationData() ?? false;
     }
 
     public static function canDelete(Model $record): bool
     {
-        return Auth::user()?->canDeleteImportantData() ?? false;
+        return auth()->user()?->canDeleteImportantData() ?? false;
     }
 
     public static function canDeleteAny(): bool
     {
-        return Auth::user()?->canDeleteImportantData() ?? false;
+        return auth()->user()?->canDeleteImportantData() ?? false;
     }
 
     public static function form(Schema $schema): Schema

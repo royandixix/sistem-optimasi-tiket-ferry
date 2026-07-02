@@ -130,6 +130,6 @@ class HasilOptimasisTable
                 ]),
             ])
             ->emptyStateHeading('Belum ada data hasil optimasi')
-            ->emptyStateDescription('Data hasil optimasi akan tampil setelah proses FCFS atau Greedy Heuristik dijalankan.');
+            ->emptyStateDescription('Pilih tombol Proses FCFS atau Proses Greedy untuk menghasilkan laporan optimasi otomatis.');
     }
 }

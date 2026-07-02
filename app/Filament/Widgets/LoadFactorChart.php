@@ -9,9 +9,20 @@ class LoadFactorChart extends ChartWidget
 {
     protected ?string $heading = 'Perbandingan Load Factor';
 
-    protected ?string $description = 'Perbandingan tingkat pemanfaatan kapasitas kapal antara FCFS dan Greedy Heuristik.';
+    protected ?string $description = 'Rata-rata pemanfaatan kapasitas kapal berdasarkan metode FCFS dan Greedy Heuristik.';
 
     protected static ?int $sort = 3;
+
+    protected int|string|array $columnSpan = [
+        'default' => 'full',
+        'sm' => 'full',
+        'md' => 'full',
+        'lg' => 'full',
+        'xl' => 1,
+        '2xl' => 1,
+    ];
+
+    protected ?string $maxHeight = '320px';
 
     public static function canView(): bool
     {
@@ -31,6 +42,16 @@ class LoadFactorChart extends ChartWidget
                         round($fcfs, 2),
                         round($greedy, 2),
                     ],
+                    'backgroundColor' => [
+                        'rgba(100, 116, 139, 0.85)',
+                        'rgba(34, 197, 94, 0.85)',
+                    ],
+                    'borderColor' => [
+                        'rgb(100, 116, 139)',
+                        'rgb(34, 197, 94)',
+                    ],
+                    'borderWidth' => 2,
+                    'borderRadius' => 10,
                 ],
             ],
             'labels' => [

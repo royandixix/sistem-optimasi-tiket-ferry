@@ -11,9 +11,18 @@ class JadwalTerbaruWidget extends TableWidget
 {
     protected static ?string $heading = 'Jadwal Keberangkatan Terbaru';
 
+    protected static ?string $description = 'Daftar jadwal kapal ferry terbaru beserta kapasitas dan status keberangkatan.';
+
     protected static ?int $sort = 4;
 
-    protected int|string|array $columnSpan = 'full';
+    protected int|string|array $columnSpan = [
+        'default' => 'full',
+        'sm' => 'full',
+        'md' => 'full',
+        'lg' => 'full',
+        'xl' => 'full',
+        '2xl' => 'full',
+    ];
 
     public static function canView(): bool
     {
@@ -27,34 +36,53 @@ class JadwalTerbaruWidget extends TableWidget
                 JadwalKeberangkatan::query()
                     ->with(['kapal', 'rute'])
                     ->latest()
-                    ->limit(5)
+                    ->limit(8)
             )
+            ->paginated(false)
+            ->striped()
             ->columns([
                 TextColumn::make('kapal.nama_kapal')
                     ->label('Kapal')
-                    ->searchable(),
+                    ->searchable()
+                    ->sortable()
+                    ->description(function (JadwalKeberangkatan $record): string {
+                        $asal = $record->rute?->pelabuhan_asal ?? '-';
+                        $tujuan = $record->rute?->pelabuhan_tujuan ?? '-';
 
-                TextColumn::make('rute.pelabuhan_asal')
-                    ->label('Asal'),
-
-                TextColumn::make('rute.pelabuhan_tujuan')
-                    ->label('Tujuan'),
+                        return "{$asal} → {$tujuan}";
+                    })
+                    ->weight('bold'),
 
                 TextColumn::make('tanggal_berangkat')
                     ->label('Tanggal')
-                    ->date('d M Y'),
+                    ->date('d M Y')
+                    ->sortable(),
 
                 TextColumn::make('jam_berangkat')
                     ->label('Jam')
-                    ->time('H:i'),
+                    ->time('H:i')
+                    ->sortable(),
 
                 TextColumn::make('kapasitas_total')
                     ->label('Kapasitas')
-                    ->numeric(),
+                    ->numeric()
+                    ->sortable()
+                    ->badge()
+                    ->color('info'),
+
+                TextColumn::make('kapasitas_terpakai')
+                    ->label('Terpakai')
+                    ->numeric()
+                    ->sortable()
+                    ->badge()
+                    ->color('warning'),
 
                 TextColumn::make('sisa_kapasitas')
                     ->label('Sisa')
-                    ->numeric(),
+                    ->numeric()
+                    ->sortable()
+                    ->badge()
+                    ->color(fn (int $state): string => $state > 0 ? 'success' : 'danger'),
 
                 TextColumn::make('status')
                     ->label('Status')
@@ -72,7 +100,10 @@ class JadwalTerbaruWidget extends TableWidget
                         'selesai' => 'gray',
                         'batal' => 'danger',
                         default => 'gray',
-                    }),
-            ]);
+                    })
+                    ->sortable(),
+            ])
+            ->emptyStateHeading('Belum ada jadwal keberangkatan')
+            ->emptyStateDescription('Data jadwal kapal ferry akan tampil setelah admin menambahkan jadwal keberangkatan.');
     }
 }

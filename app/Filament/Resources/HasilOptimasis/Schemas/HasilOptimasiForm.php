@@ -7,6 +7,7 @@ use Filament\Forms\Components\TextInput;
 use Filament\Schemas\Components\Section;
 use Filament\Schemas\Schema;
 use Illuminate\Support\Facades\Auth;
+
 class HasilOptimasiForm
 {
     public static function configure(Schema $schema): Schema
@@ -14,7 +15,7 @@ class HasilOptimasiForm
         return $schema
             ->components([
                 Section::make('Informasi Jadwal dan Metode')
-                    ->description('Pilih jadwal keberangkatan dan metode yang digunakan untuk mengevaluasi alokasi tiket.')
+                    ->description('Pilih jadwal keberangkatan dan metode optimasi yang digunakan.')
                     ->columnSpanFull()
                     ->columns(2)
                     ->schema([
@@ -23,7 +24,7 @@ class HasilOptimasiForm
                             ->relationship('jadwal', 'tanggal_berangkat')
                             ->getOptionLabelFromRecordUsing(function ($record): string {
                                 $tanggal = optional($record->tanggal_berangkat)->format('d-m-Y') ?? '-';
-                                $jam = $record->jam_berangkat ?? '-';
+                                $jam = $record->jam_berangkat ? substr((string) $record->jam_berangkat, 0, 5) : '-';
                                 $kapal = $record->kapal?->nama_kapal ?? '-';
                                 $asal = $record->rute?->pelabuhan_asal ?? '-';
                                 $tujuan = $record->rute?->pelabuhan_tujuan ?? '-';
@@ -47,7 +48,7 @@ class HasilOptimasiForm
                     ]),
 
                 Section::make('Rekap Pemesanan Tiket')
-                    ->description('Masukkan jumlah pemesanan dan hasil penerimaan tiket berdasarkan metode yang digunakan.')
+                    ->description('Data rekap pemesanan tiket berdasarkan hasil proses optimasi.')
                     ->columnSpanFull()
                     ->columns(4)
                     ->schema([
@@ -81,7 +82,7 @@ class HasilOptimasiForm
                     ]),
 
                 Section::make('Evaluasi Pemanfaatan Kapasitas Kapal')
-                    ->description('Bagian ini digunakan untuk menghitung tingkat pemanfaatan kapasitas kapal atau load factor.')
+                    ->description('Load factor menunjukkan tingkat pemanfaatan kapasitas kapal.')
                     ->columnSpanFull()
                     ->columns(4)
                     ->schema([
@@ -101,7 +102,6 @@ class HasilOptimasiForm
 
                         TextInput::make('load_factor')
                             ->label('Load Factor')
-                            ->helperText('Rumus: kapasitas terpakai / kapasitas kapal × 100%.')
                             ->numeric()
                             ->minValue(0)
                             ->maxValue(100)
@@ -112,7 +112,6 @@ class HasilOptimasiForm
 
                         TextInput::make('waktu_proses_ms')
                             ->label('Waktu Proses')
-                            ->helperText('Waktu komputasi dalam milidetik.')
                             ->numeric()
                             ->minValue(0)
                             ->step('0.0001')
@@ -122,7 +121,7 @@ class HasilOptimasiForm
                     ]),
 
                 Section::make('Informasi Proses')
-                    ->description('Menampilkan user internal yang memproses data hasil optimasi.')
+                    ->description('User internal yang menjalankan atau mencatat hasil optimasi.')
                     ->columnSpanFull()
                     ->columns(2)
                     ->schema([

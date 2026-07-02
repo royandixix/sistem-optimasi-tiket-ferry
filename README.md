@@ -1,59 +1,239 @@
-<p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400" alt="Laravel Logo"></a></p>
+Markdown
+# Sistem Optimasi Tiket Ferry
 
-<p align="center">
-<a href="https://github.com/laravel/framework/actions"><img src="https://github.com/laravel/framework/workflows/tests/badge.svg" alt="Build Status"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/dt/laravel/framework" alt="Total Downloads"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/v/laravel/framework" alt="Latest Stable Version"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
-</p>
+Sistem Optimasi Tiket Ferry adalah aplikasi sistem informasi berbasis web yang digunakan untuk membantu proses pemesanan tiket kapal ferry, pengelolaan jadwal keberangkatan, data kapal, rute, penumpang, serta monitoring alokasi kapasitas kapal.
 
-## About Laravel
+Sistem ini dibuat untuk mendukung proses digitalisasi layanan tiket ferry agar pemesanan menjadi lebih tertata, data lebih mudah dipantau, dan kapasitas kapal dapat dikelola secara lebih optimal.
 
-Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:
+## Deskripsi Singkat
 
-- [Simple, fast routing engine](https://laravel.com/docs/routing).
-- [Powerful dependency injection container](https://laravel.com/docs/container).
-- Multiple back-ends for [session](https://laravel.com/docs/session) and [cache](https://laravel.com/docs/cache) storage.
-- Expressive, intuitive [database ORM](https://laravel.com/docs/eloquent).
-- Database agnostic [schema migrations](https://laravel.com/docs/migrations).
-- [Robust background job processing](https://laravel.com/docs/queues).
-- [Real-time event broadcasting](https://laravel.com/docs/broadcasting).
+Aplikasi ini menyediakan portal untuk penumpang dalam melakukan registrasi, login, pemesanan tiket, melihat riwayat pemesanan, dan memperbarui profil. Selain itu, sistem juga mendukung pengelolaan data internal seperti kapal, rute, jadwal keberangkatan, pemesanan tiket, alokasi tiket, dan hasil optimasi.
 
-Laravel is accessible, powerful, and provides tools required for large, robust applications.
+Studi kasus sistem ini berfokus pada proses pengelolaan tiket ferry dengan kebutuhan utama berupa pemanfaatan kapasitas kapal, monitoring status pemesanan, dan pencatatan data pemesanan secara digital.
 
-## Learning Laravel
+## Fitur Utama
 
-Laravel has the most extensive and thorough [documentation](https://laravel.com/docs) and video tutorial library of all modern web application frameworks, making it a breeze to get started with the framework.
+### Portal Penumpang
+- Registrasi akun penumpang
+- Login dan logout akun penumpang
+- Dashboard penumpang
+- Pemesanan tiket kapal ferry
+- Riwayat pemesanan tiket
+- Detail status pemesanan
+- Edit pemesanan selama status masih menunggu proses
+- Edit profil penumpang
+- Notifikasi menggunakan SweetAlert2
 
-In addition, [Laracasts](https://laracasts.com) contains thousands of video tutorials on a range of topics including Laravel, modern PHP, unit testing, and JavaScript. Boost your skills by digging into our comprehensive video library.
+### Pengelolaan Data Internal
+- Manajemen data pengguna
+- Manajemen data kapal
+- Manajemen data rute
+- Manajemen jadwal keberangkatan
+- Manajemen data penumpang
+- Manajemen pemesanan tiket
+- Pengelolaan alokasi tiket
+- Monitoring hasil optimasi
+- Laporan pemanfaatan kapasitas kapal
 
-You can also watch bite-sized lessons with real-world projects on [Laravel Learn](https://laravel.com/learn), where you will be guided through building a Laravel application from scratch while learning PHP fundamentals.
+### Role Pengguna
+- Super Admin
+- Admin
+- Pimpinan
+- Penumpang
 
-## Agentic Development
+## Teknologi yang Digunakan
 
-Laravel's predictable structure and conventions make it ideal for AI coding agents like Claude Code, Cursor, and GitHub Copilot. Install [Laravel Boost](https://laravel.com/docs/ai) to supercharge your AI workflow:
+- PHP
+- Laravel
+- MySQL
+- Filament
+- Bootstrap
+- Bootstrap Icons
+- SweetAlert2
+- Mentor Bootstrap Template
 
-```bash
-composer require laravel/boost --dev
+## Struktur Utama Project
 
-php artisan boost:install
-```
+```text
+app/
+├── Http/
+│   ├── Controllers/
+│   │   ├── AuthController.php
+│   │   └── User/
+│   │       ├── DashboardController.php
+│   │       ├── PemesananTiketController.php
+│   │       └── ProfilController.php
+│   └── Middleware/
+│       └── RoleMiddleware.php
+├── Models/
+│   ├── User.php
+│   ├── Kapal.php
+│   ├── Rute.php
+│   ├── JadwalKeberangkatan.php
+│   ├── Penumpang.php
+│   ├── PemesananTiket.php
+│   ├── AlokasiTiket.php
+│   └── HasilOptimasi.php
 
-Boost provides your agent 15+ tools and skills that help agents build Laravel applications while following best practices.
+resources/
+└── views/
+    └── user/
+        ├── auth/
+        │   ├── login.blade.php
+        │   └── register.blade.php
+        ├── home/
+        │   └── index.blade.php
+        ├── layouts/
+        │   ├── app.blade.php
+        │   └── guest.blade.php
+        ├── partials/
+        │   ├── alerts.blade.php
+        │   ├── footer.blade.php
+        │   └── navbar.blade.php
+        ├── pemesanan/
+        │   ├── index.blade.php
+        │   ├── create.blade.php
+        │   ├── edit.blade.php
+        │   └── show.blade.php
+        ├── profil/
+        │   └── edit.blade.php
+        └── dashboard.blade.php
+Instalasi Project
+Clone repository:
 
-## Contributing
+Bash
+git clone [https://github.com/USERNAME/sistem-optimasi-tiket-ferry.git](https://github.com/USERNAME/sistem-optimasi-tiket-ferry.git)
+cd sistem-optimasi-tiket-ferry
+Install dependency PHP:
 
-Thank you for considering contributing to the Laravel framework! The contribution guide can be found in the [Laravel documentation](https://laravel.com/docs/contributions).
+Bash
+composer install
+Install dependency frontend:
 
-## Code of Conduct
+Bash
+npm install
+Salin file environment:
 
-In order to ensure that the Laravel community is welcoming to all, please review and abide by the [Code of Conduct](https://laravel.com/docs/contributions#code-of-conduct).
+Bash
+cp .env.example .env
+Generate application key:
 
-## Security Vulnerabilities
+Bash
+php artisan key:generate
+Atur konfigurasi database pada file .env:
 
-If you discover a security vulnerability within Laravel, please send an e-mail to Taylor Otwell via [taylor@laravel.com](mailto:taylor@laravel.com). All security vulnerabilities will be promptly addressed.
+Cuplikan kode
+DB_CONNECTION=mysql
+DB_HOST=127.0.0.1
+DB_PORT=3306
+DB_DATABASE=optimasi_tiket_ferry
+DB_USERNAME=root
+DB_PASSWORD=
+Jalankan migration:
 
-## License
+Bash
+php artisan migrate
+Jalankan seeder jika tersedia:
 
-The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
-# sistem-optimasi-tiket-ferry
+Bash
+php artisan db:seed
+Jalankan server lokal:
+
+Bash
+php artisan serve
+Buka aplikasi:
+
+Plaintext
+[http://127.0.0.1:8000](http://127.0.0.1:8000)
+Halaman Aplikasi
+Landing Page
+/
+Menampilkan informasi umum sistem, fitur utama, alur sistem, dan tombol masuk ke portal penumpang.
+
+Login Penumpang
+/user/login
+Digunakan oleh penumpang untuk masuk ke sistem.
+
+Registrasi Penumpang
+/user/register
+Digunakan oleh penumpang untuk membuat akun baru.
+
+Dashboard Penumpang
+/user/dashboard
+Menampilkan ringkasan pemesanan tiket dan informasi akun penumpang.
+
+Pemesanan Tiket
+/user/pemesanan
+Menampilkan riwayat pemesanan tiket penumpang.
+
+Profil Penumpang
+/user/profil
+Digunakan untuk memperbarui data akun dan informasi penumpang.
+
+Alur Penggunaan Penumpang
+Penumpang membuka halaman utama sistem.
+
+Penumpang melakukan registrasi akun.
+
+Penumpang login ke portal.
+
+Penumpang melengkapi profil.
+
+Penumpang memilih jadwal keberangkatan.
+
+Penumpang membuat pemesanan tiket.
+
+Sistem menyimpan data pemesanan dengan status menunggu proses.
+
+Penumpang dapat melihat riwayat dan status pemesanan.
+
+Admin memproses data pemesanan dan alokasi tiket.
+
+Penumpang melihat hasil status pemesanan.
+
+Akun Testing
+Gunakan data berikut untuk testing penumpang:
+
+Nama: Penumpang
+
+Email: penumpang@gmail.com
+
+Password: password123
+
+NIK: 9999999999999999
+
+Nomor HP: 081234567890
+
+Alamat: Jl. Poros Siwa - Tobaku
+
+Catatan Environment
+File .env tidak disertakan ke repository karena berisi konfigurasi lokal dan data sensitif. Gunakan .env.example sebagai acuan konfigurasi.
+
+Pastikan nilai berikut disesuaikan saat menjalankan project secara lokal:
+
+Cuplikan kode
+APP_URL=[http://127.0.0.1:8000](http://127.0.0.1:8000)
+SESSION_DOMAIN=
+Status Pengembangan
+Project ini masih dapat dikembangkan dengan beberapa fitur tambahan seperti:
+
+Cetak tiket
+
+Upload bukti pembayaran
+
+Integrasi pembayaran
+
+Notifikasi email
+
+Export laporan PDF
+
+Export laporan Excel
+
+Grafik hasil optimasi
+
+Validasi kapasitas kapal secara otomatis
+
+Riwayat perubahan status pemesanan
+
+Lisensi
+Project ini dibuat untuk kebutuhan pembelajaran, penelitian, dan pengembangan sistem informasi optimasi tiket ferry.

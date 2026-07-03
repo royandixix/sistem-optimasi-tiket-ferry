@@ -22,7 +22,7 @@
 @include('user.partials.navbar')
 <main class="main">
     <section id="hero" class="hero section dark-background">
-        <img src="{{ asset('Mentor-1.0.0/assets/img/hero-bg.jpg') }}" alt="Sistem Optimasi Tiket Ferry" data-aos="fade-in">
+        <img src="https://loremflickr.com/1600/900/ferry,ship,sea?lock=12" alt="Kapal Ferry di Laut" data-aos="fade-in">
         <div class="container">
             <h2 data-aos="fade-up" data-aos-delay="100">
                 Sistem Informasi Optimasi<br>Alokasi Tiket Ferry
@@ -51,7 +51,7 @@
         <div class="container">
             <div class="row gy-4 align-items-center">
                 <div class="col-lg-6 order-1 order-lg-2" data-aos="fade-up" data-aos-delay="100">
-                    <img src="{{ asset('Mentor-1.0.0/assets/img/about.jpg') }}" class="img-fluid" alt="Tentang Sistem">
+                    <img src="https://loremflickr.com/800/600/ferry,harbor,port?lock=7" class="img-fluid rounded-4 shadow-sm" alt="Pelabuhan Ferry">
                 </div>
                 <div class="col-lg-6 order-2 order-lg-1 content" data-aos="fade-up" data-aos-delay="200">
                     <h3>Tentang Sistem</h3>
@@ -410,6 +410,64 @@
                                 <li class="mb-2"><i class="bi bi-check-circle text-success me-2"></i>Mendukung pengambilan keputusan berbasis data.</li>
                             </ul>
                         </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+    <section id="galeri" class="section why-us">
+        <div class="container">
+            <div class="section-title" data-aos="fade-up">
+                <h2>Galeri</h2>
+                <p>Suasana Layanan Ferry</p>
+            </div>
+            <div class="row justify-content-center" data-aos="fade-up" data-aos-delay="100">
+                <div class="col-lg-9">
+                    <div id="galeriCarousel" class="carousel slide carousel-fade rounded-4 overflow-hidden shadow-sm" data-bs-ride="carousel">
+                        <div class="carousel-indicators">
+                            <button type="button" data-bs-target="#galeriCarousel" data-bs-slide-to="0" class="active" aria-label="Slide 1"></button>
+                            <button type="button" data-bs-target="#galeriCarousel" data-bs-slide-to="1" aria-label="Slide 2"></button>
+                            <button type="button" data-bs-target="#galeriCarousel" data-bs-slide-to="2" aria-label="Slide 3"></button>
+                            <button type="button" data-bs-target="#galeriCarousel" data-bs-slide-to="3" aria-label="Slide 4"></button>
+                        </div>
+                        <div class="carousel-inner">
+                            <div class="carousel-item active">
+                                <img src="https://loremflickr.com/1200/600/ferry,ship?lock=21" class="d-block w-100" alt="Kapal Ferry">
+                                <div class="carousel-caption d-none d-md-block">
+                                    <h5>Kapal Ferry</h5>
+                                    <p>Melayani penyeberangan penumpang antar pelabuhan.</p>
+                                </div>
+                            </div>
+                            <div class="carousel-item">
+                                <img src="https://loremflickr.com/1200/600/harbor,port,sea?lock=22" class="d-block w-100" alt="Pelabuhan">
+                                <div class="carousel-caption d-none d-md-block">
+                                    <h5>Pelabuhan</h5>
+                                    <p>Titik keberangkatan dan kedatangan kapal.</p>
+                                </div>
+                            </div>
+                            <div class="carousel-item">
+                                <img src="https://loremflickr.com/1200/600/boat,ocean?lock=23" class="d-block w-100" alt="Perjalanan Laut">
+                                <div class="carousel-caption d-none d-md-block">
+                                    <h5>Perjalanan Laut</h5>
+                                    <p>Penyeberangan yang aman sesuai kapasitas kapal.</p>
+                                </div>
+                            </div>
+                            <div class="carousel-item">
+                                <img src="https://loremflickr.com/1200/600/dock,ship,sea?lock=24" class="d-block w-100" alt="Dermaga">
+                                <div class="carousel-caption d-none d-md-block">
+                                    <h5>Dermaga</h5>
+                                    <p>Proses naik-turun penumpang yang tertata.</p>
+                                </div>
+                            </div>
+                        </div>
+                        <button class="carousel-control-prev" type="button" data-bs-target="#galeriCarousel" data-bs-slide="prev">
+                            <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+                            <span class="visually-hidden">Sebelumnya</span>
+                        </button>
+                        <button class="carousel-control-next" type="button" data-bs-target="#galeriCarousel" data-bs-slide="next">
+                            <span class="carousel-control-next-icon" aria-hidden="true"></span>
+                            <span class="visually-hidden">Berikutnya</span>
+                        </button>
                     </div>
                 </div>
             </div>

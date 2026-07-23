@@ -47,7 +47,8 @@ class UserInfolist
                             ->badge()
                             ->formatStateUsing(fn (string $state): string => match ($state) {
                                 'super_admin' => 'Super Admin',
-                                'admin' => 'Admin/Petugas',
+                                'admin' => 'Admin',
+                                'petugas' => 'Petugas Validasi',
                                 'pimpinan' => 'Pimpinan',
                                 'penumpang' => 'Penumpang',
                                 default => ucfirst($state),
@@ -55,8 +56,9 @@ class UserInfolist
                             ->color(fn (string $state): string => match ($state) {
                                 'super_admin' => 'danger',
                                 'admin' => 'warning',
+                                'petugas' => 'success',
                                 'pimpinan' => 'info',
-                                'penumpang' => 'success',
+                                'penumpang' => 'gray',
                                 default => 'gray',
                             }),
 

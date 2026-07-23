@@ -1,94 +1,307 @@
 @extends('user.layouts.app')
 
 @section('title', 'Buat Pemesanan')
-@section('page-title', 'Buat Pemesanan Tiket')
-@section('page-description', 'Pilih jadwal keberangkatan dan masukkan jumlah tiket yang ingin Anda pesan.')
+@section('page-title', 'Pilih Kapal Ferry')
+@section(
+    'page-description',
+    'Pilih kapal dan jadwal keberangkatan yang tersedia, kemudian tentukan jumlah tiket.'
+)
 
 @section('content')
 
-<div class="row justify-content-center">
-    <div class="col-lg-8">
+<style>
+    .kapal-option-card {
+        border-radius: 22px;
+        overflow: hidden;
+        cursor: pointer;
+        transition: .25s ease;
+        border: 2px solid transparent !important;
+    }
 
-        <div class="card border-0 shadow-sm">
-            <div class="card-body p-4">
+    .kapal-option-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 18px 40px rgba(0, 0, 0, .12) !important;
+    }
 
-                <h4 class="mb-2">Form Pemesanan Tiket</h4>
-                <p class="text-muted mb-4">
-                    Pastikan jadwal dan jumlah tiket yang Anda pilih sudah sesuai sebelum mengirim pemesanan.
-                </p>
+    .btn-check:checked + .kapal-option-card {
+        border-color: #198754 !important;
+        box-shadow: 0 18px 40px rgba(25, 135, 84, .22) !important;
+        transform: translateY(-4px);
+    }
 
-                @if ($jadwals->count() > 0)
-                    <form method="POST" action="{{ route('user.pemesanan.store') }}">
-                        @csrf
+    .kapal-image-wrapper {
+        position: relative;
+        height: 260px;
+        overflow: hidden;
+        background: #e9ecef;
+    }
 
-                        <div class="mb-3">
-                            <label class="form-label">Jadwal Keberangkatan</label>
-                            <select name="jadwal_id" class="form-select" required>
-                                <option value="">Pilih jadwal keberangkatan</option>
+    .kapal-image {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        transition: transform .35s ease;
+    }
 
-                                @foreach ($jadwals as $jadwal)
-                                    <option value="{{ $jadwal->id }}" @selected(old('jadwal_id') == $jadwal->id)>
-                                        {{ $jadwal->tanggal_berangkat }}
-                                        {{ $jadwal->jam_berangkat }}
-                                        -
-                                        {{ optional($jadwal->rute)->pelabuhan_asal ?? '-' }}
-                                        ke
-                                        {{ optional($jadwal->rute)->pelabuhan_tujuan ?? '-' }}
-                                        |
-                                        {{ optional($jadwal->kapal)->nama_kapal ?? 'Kapal' }}
-                                        |
-                                        Kapasitas: {{ $jadwal->kapasitas_total }}
-                                    </option>
-                                @endforeach
-                            </select>
-                        </div>
+    .kapal-option-card:hover .kapal-image {
+        transform: scale(1.04);
+    }
 
-                        <div class="mb-3">
-                            <label class="form-label">Jumlah Tiket</label>
-                            <input type="number"
-                                   name="jumlah_tiket"
-                                   value="{{ old('jumlah_tiket', 1) }}"
-                                   class="form-control"
-                                   min="1"
-                                   required>
-                        </div>
+    .kapal-image-placeholder {
+        width: 100%;
+        height: 100%;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        color: white;
+        background: linear-gradient(135deg, #198754, #0d6efd);
+    }
 
-                        <div class="mb-4">
-                            <label class="form-label">Catatan</label>
-                            <textarea name="catatan"
-                                      class="form-control"
-                                      rows="3"
-                                      placeholder="Catatan tambahan, boleh dikosongkan">{{ old('catatan') }}</textarea>
-                        </div>
+    .kapal-image-placeholder i {
+        font-size: 58px;
+        margin-bottom: 10px;
+    }
 
-                        <div class="d-flex justify-content-between">
-                            <a href="{{ route('user.pemesanan.index') }}" class="btn btn-outline-secondary rounded-pill">
-                                Kembali
-                            </a>
+    .kapal-photo-count {
+        position: absolute;
+        top: 16px;
+        left: 16px;
+        padding: 9px 13px;
+    }
 
-                            <button type="submit" class="btn btn-success rounded-pill">
-                                Simpan Pemesanan
-                            </button>
-                        </div>
-                    </form>
-                @else
-                    <div class="text-center py-5">
-                        <i class="bi bi-calendar-x display-4 text-warning"></i>
-                        <h5 class="mt-3">Belum Ada Jadwal Tersedia</h5>
-                        <p class="text-muted">
-                            Saat ini belum ada jadwal keberangkatan yang tersedia untuk pemesanan.
-                        </p>
+    .kapal-selected-indicator {
+        position: absolute;
+        top: 16px;
+        right: 16px;
+        background: #198754;
+        color: white;
+        border-radius: 50rem;
+        padding: 9px 14px;
+        font-size: 13px;
+        font-weight: 600;
+        opacity: 0;
+        transform: translateY(-6px);
+        transition: .2s ease;
+    }
 
-                        <a href="{{ route('user.pemesanan.index') }}" class="btn btn-outline-secondary rounded-pill">
-                            Kembali
-                        </a>
-                    </div>
-                @endif
+    .btn-check:checked + .kapal-option-card .kapal-selected-indicator {
+        opacity: 1;
+        transform: translateY(0);
+    }
 
-            </div>
+    .kapal-info-box {
+        display: flex;
+        align-items: center;
+        gap: 11px;
+        padding: 12px;
+        height: 100%;
+        border-radius: 14px;
+        background: #f7f9fa;
+    }
+
+    .kapal-info-box i {
+        color: #198754;
+        font-size: 20px;
+    }
+
+    .kapal-info-box small,
+    .kapal-info-box strong {
+        display: block;
+    }
+
+    .kapal-info-box small {
+        color: #6c757d;
+        font-size: 11px;
+    }
+
+    .pilih-kapal-text {
+        color: #198754;
+        font-weight: 600;
+        padding: 11px;
+        border-radius: 12px;
+        background: rgba(25, 135, 84, .08);
+    }
+
+    .booking-form-card {
+        border-radius: 22px;
+    }
+
+    @media (max-width: 767px) {
+        .kapal-image-wrapper {
+            height: 220px;
+        }
+    }
+</style>
+
+<div class="d-flex flex-wrap justify-content-between align-items-center gap-3 mb-4">
+    <div>
+        <h3 class="mb-1">Kapal dan Jadwal Tersedia</h3>
+        <p class="text-muted mb-0">
+            Klik salah satu card kapal untuk menentukan keberangkatan.
+        </p>
+    </div>
+
+    <a
+        href="{{ route('user.pemesanan.index') }}"
+        class="btn btn-outline-secondary rounded-pill"
+    >
+        <i class="bi bi-arrow-left me-1"></i>
+        Riwayat Pemesanan
+    </a>
+</div>
+
+@if ($errors->any())
+    <div class="alert alert-danger rounded-4">
+        <strong>Periksa kembali data berikut:</strong>
+        <ul class="mb-0 mt-2">
+            @foreach ($errors->all() as $error)
+                <li>{{ $error }}</li>
+            @endforeach
+        </ul>
+    </div>
+@endif
+
+@if ($jadwals->count() > 0)
+    <form method="POST" action="{{ route('user.pemesanan.store') }}">
+        @csrf
+
+        <div class="row g-4 mb-5">
+            @foreach ($jadwals as $jadwal)
+                @include(
+                    'user.pemesanan.partials.jadwal-card',
+                    [
+                        'jadwal' => $jadwal,
+                        'selectedJadwalId' => old('jadwal_id'),
+                    ]
+                )
+            @endforeach
         </div>
 
+        <div class="card border-0 shadow-sm booking-form-card">
+            <div class="card-body p-4 p-lg-5">
+                <div class="row align-items-center mb-4">
+                    <div class="col-lg-8">
+                        <h4 class="mb-1">Detail Pemesanan</h4>
+                        <p class="text-muted mb-0">
+                            Setelah memilih kapal, masukkan jumlah tiket yang dibutuhkan.
+                        </p>
+                    </div>
+                </div>
+
+                <div class="row g-4">
+                    <div class="col-lg-4">
+                        <label for="jumlah_tiket" class="form-label fw-semibold">
+                            Jumlah Tiket
+                        </label>
+
+                        <div class="input-group input-group-lg">
+                            <span class="input-group-text bg-white">
+                                <i class="bi bi-ticket-perforated"></i>
+                            </span>
+
+                            <input
+                                type="number"
+                                name="jumlah_tiket"
+                                id="jumlah_tiket"
+                                value="{{ old('jumlah_tiket', 1) }}"
+                                class="form-control"
+                                min="1"
+                                required
+                            >
+                        </div>
+
+                        <small id="capacity-helper" class="text-muted">
+                            Pilih kapal untuk melihat sisa kapasitas.
+                        </small>
+                    </div>
+
+                    <div class="col-lg-8">
+                        <label for="catatan" class="form-label fw-semibold">
+                            Catatan
+                        </label>
+
+                        <textarea
+                            name="catatan"
+                            id="catatan"
+                            class="form-control"
+                            rows="4"
+                            placeholder="Contoh: Membawa barang tambahan atau kebutuhan khusus"
+                        >{{ old('catatan') }}</textarea>
+                    </div>
+                </div>
+
+                <div class="d-flex flex-wrap justify-content-between gap-3 mt-4">
+                    <a
+                        href="{{ route('user.pemesanan.index') }}"
+                        class="btn btn-outline-secondary rounded-pill px-4"
+                    >
+                        Batal
+                    </a>
+
+                    <button
+                        type="submit"
+                        class="btn btn-success rounded-pill px-5"
+                    >
+                        <i class="bi bi-check-circle me-1"></i>
+                        Buat Pemesanan
+                    </button>
+                </div>
+            </div>
+        </div>
+    </form>
+@else
+    <div class="card border-0 shadow-sm rounded-4">
+        <div class="card-body text-center py-5">
+            <i class="bi bi-calendar-x display-3 text-warning"></i>
+
+            <h4 class="mt-3">Belum Ada Kapal yang Tersedia</h4>
+
+            <p class="text-muted">
+                Saat ini belum ada jadwal keberangkatan yang dapat dipesan.
+            </p>
+
+            <a
+                href="{{ route('user.pemesanan.index') }}"
+                class="btn btn-outline-secondary rounded-pill"
+            >
+                Kembali
+            </a>
+        </div>
     </div>
-</div>
+@endif
+
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        const radios = document.querySelectorAll('.jadwal-radio');
+        const jumlahTiket = document.getElementById('jumlah_tiket');
+        const capacityHelper = document.getElementById('capacity-helper');
+
+        function updateCapacity() {
+            const selected = document.querySelector('.jadwal-radio:checked');
+
+            if (!selected || !jumlahTiket || !capacityHelper) {
+                return;
+            }
+
+            const capacity = Number(selected.dataset.capacity || 1);
+
+            jumlahTiket.max = capacity;
+
+            if (Number(jumlahTiket.value) > capacity) {
+                jumlahTiket.value = capacity;
+            }
+
+            capacityHelper.textContent =
+                'Maksimal ' + capacity + ' tiket sesuai sisa kapasitas.';
+        }
+
+        radios.forEach(function (radio) {
+            radio.addEventListener('change', updateCapacity);
+        });
+
+        updateCapacity();
+    });
+</script>
 
 @endsection

@@ -32,7 +32,8 @@ class UsersTable
                     ->badge()
                     ->formatStateUsing(fn (string $state): string => match ($state) {
                         'super_admin' => 'Super Admin',
-                        'admin' => 'Admin/Petugas',
+                        'admin' => 'Admin',
+                        'petugas' => 'Petugas Validasi',
                         'pimpinan' => 'Pimpinan',
                         'penumpang' => 'Penumpang',
                         default => ucfirst($state),
@@ -40,8 +41,9 @@ class UsersTable
                     ->color(fn (string $state): string => match ($state) {
                         'super_admin' => 'danger',
                         'admin' => 'warning',
+                        'petugas' => 'success',
                         'pimpinan' => 'info',
-                        'penumpang' => 'success',
+                        'penumpang' => 'gray',
                         default => 'gray',
                     })
                     ->sortable(),
@@ -84,7 +86,8 @@ class UsersTable
                     ->label('Filter Role')
                     ->options([
                         'super_admin' => 'Super Admin',
-                        'admin' => 'Admin/Petugas',
+                        'admin' => 'Admin',
+                        'petugas' => 'Petugas Validasi',
                         'pimpinan' => 'Pimpinan',
                         'penumpang' => 'Penumpang',
                     ]),

@@ -25,6 +25,7 @@ return new class extends Migration
             $table->unsignedInteger('kapasitas_total');
             $table->unsignedInteger('kapasitas_terpakai')->default(0);
             $table->unsignedInteger('sisa_kapasitas')->default(0);
+           
 
             $table->enum('status', [
                 'tersedia',

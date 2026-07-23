@@ -12,7 +12,15 @@ class Kapal extends Model
         'nama_kapal',
         'kapasitas_penumpang',
         'status',
+        'gambar_kapal',
     ];
+
+    protected function casts(): array
+    {
+        return [
+            'gambar_kapal' => 'array',
+        ];
+    }
 
     public function jadwalKeberangkatans(): HasMany
     {

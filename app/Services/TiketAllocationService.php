@@ -14,13 +14,13 @@ class TiketAllocationService
 {
     public function process(int $jadwalId, string $metode): HasilOptimasi
     {
-        if (! in_array($metode, ['fcfs', 'greedy'])) {
-            throw new InvalidArgumentException('Metode optimasi tidak valid.');
+        if (! in_array($metode, ['fcfs', 'greedy'], true)) {
+            throw new InvalidArgumentException('Metode alokasi tidak valid.');
         }
 
-        $startTime = microtime(true);
+        return DB::transaction(function () use ($jadwalId, $metode) {
+            $startTime = microtime(true);
 
-        return DB::transaction(function () use ($jadwalId, $metode, $startTime) {
             $jadwal = JadwalKeberangkatan::query()
                 ->lockForUpdate()
                 ->findOrFail($jadwalId);
@@ -28,31 +28,50 @@ class TiketAllocationService
             $kapasitasKapal = (int) $jadwal->kapasitas_total;
             $sisaKapasitas = $kapasitasKapal;
 
+            // Hapus hasil alokasi lama untuk jadwal dan metode yang sama
             AlokasiTiket::query()
                 ->where('jadwal_id', $jadwal->id)
                 ->where('metode', $metode)
                 ->delete();
 
-            $pemesanans = $this->getPemesanans($jadwal->id, $metode);
+            $query = PemesananTiket::query()
+                ->where('jadwal_id', $jadwal->id);
+
+            // FCFS: berdasarkan waktu pemesanan paling awal
+            if ($metode === 'fcfs') {
+                $query->orderBy('waktu_pemesanan', 'asc')
+                    ->orderBy('id', 'asc');
+            }
+
+            // Greedy: prioritas jumlah tiket terbesar yang masih bisa masuk kapasitas
+            if ($metode === 'greedy') {
+                $query->orderBy('jumlah_tiket', 'desc')
+                    ->orderBy('waktu_pemesanan', 'asc')
+                    ->orderBy('id', 'asc');
+            }
+
+            $pemesanans = $query->lockForUpdate()->get();
 
             $totalPemesanan = $pemesanans->count();
             $totalTiketDiminta = 0;
             $totalTiketDiterima = 0;
             $totalTiketDitolak = 0;
+            $urutan = 1;
 
-            foreach ($pemesanans as $index => $pemesanan) {
+            foreach ($pemesanans as $pemesanan) {
                 $jumlahTiket = (int) $pemesanan->jumlah_tiket;
                 $totalTiketDiminta += $jumlahTiket;
 
-                $diterima = $jumlahTiket <= $sisaKapasitas;
-                $jumlahDialokasikan = $diterima ? $jumlahTiket : 0;
-                $statusAlokasi = $diterima ? 'diterima' : 'ditolak';
                 $sisaSebelum = $sisaKapasitas;
 
-                if ($diterima) {
+                if ($jumlahTiket <= $sisaKapasitas) {
+                    $statusAlokasi = 'diterima';
+                    $jumlahDialokasikan = $jumlahTiket;
                     $sisaKapasitas -= $jumlahTiket;
                     $totalTiketDiterima += $jumlahTiket;
                 } else {
+                    $statusAlokasi = 'ditolak';
+                    $jumlahDialokasikan = 0;
                     $totalTiketDitolak += $jumlahTiket;
                 }
 
@@ -61,31 +80,35 @@ class TiketAllocationService
                     'jadwal_id' => $jadwal->id,
                     'metode' => $metode,
                     'jumlah_dialokasikan' => $jumlahDialokasikan,
-                    'nilai_prioritas' => $this->getNilaiPrioritas($pemesanan, $metode, $index),
+                    'nilai_prioritas' => $metode === 'greedy' ? $jumlahTiket : $urutan,
                     'sisa_kapasitas_sebelum' => $sisaSebelum,
                     'sisa_kapasitas_sesudah' => $sisaKapasitas,
                     'status_alokasi' => $statusAlokasi,
                     'diproses_oleh' => Auth::id(),
                 ]);
 
+                // Status pemesanan mengikuti metode proses terakhir
                 $pemesanan->update([
                     'status_pemesanan' => $statusAlokasi,
                     'metode_alokasi' => $metode,
                 ]);
+
+                $urutan++;
             }
 
-            $kapasitasTerpakai = $kapasitasKapal - $sisaKapasitas;
+            $kapasitasTerpakai = $totalTiketDiterima;
+
             $loadFactor = $kapasitasKapal > 0
-                ? round(($kapasitasTerpakai / $kapasitasKapal) * 100, 2)
+                ? ($kapasitasTerpakai / $kapasitasKapal) * 100
                 : 0;
+
+            $waktuProsesMs = (microtime(true) - $startTime) * 1000;
 
             $jadwal->update([
                 'kapasitas_terpakai' => $kapasitasTerpakai,
-                'sisa_kapasitas' => $sisaKapasitas,
-                'status' => $sisaKapasitas <= 0 && $kapasitasKapal > 0 ? 'penuh' : 'tersedia',
+                'sisa_kapasitas' => max($kapasitasKapal - $kapasitasTerpakai, 0),
+                'status' => $kapasitasTerpakai >= $kapasitasKapal ? 'penuh' : 'tersedia',
             ]);
-
-            $waktuProsesMs = round((microtime(true) - $startTime) * 1000, 4);
 
             return HasilOptimasi::updateOrCreate(
                 [
@@ -99,39 +122,11 @@ class TiketAllocationService
                     'total_tiket_ditolak' => $totalTiketDitolak,
                     'kapasitas_kapal' => $kapasitasKapal,
                     'kapasitas_terpakai' => $kapasitasTerpakai,
-                    'load_factor' => $loadFactor,
-                    'waktu_proses_ms' => $waktuProsesMs,
+                    'load_factor' => round($loadFactor, 2),
+                    'waktu_proses_ms' => round($waktuProsesMs, 4),
                     'diproses_oleh' => Auth::id(),
                 ]
             );
         });
-    }
-
-    private function getPemesanans(int $jadwalId, string $metode)
-    {
-        $query = PemesananTiket::query()
-            ->where('jadwal_id', $jadwalId);
-
-        if ($metode === 'fcfs') {
-            return $query
-                ->orderBy('waktu_pemesanan')
-                ->orderBy('id')
-                ->get();
-        }
-
-        return $query
-            ->orderByDesc('jumlah_tiket')
-            ->orderBy('waktu_pemesanan')
-            ->orderBy('id')
-            ->get();
-    }
-
-    private function getNilaiPrioritas(PemesananTiket $pemesanan, string $metode, int $index): int
-    {
-        if ($metode === 'greedy') {
-            return (int) $pemesanan->jumlah_tiket;
-        }
-
-        return $index + 1;
     }
 }

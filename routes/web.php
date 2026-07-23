@@ -18,37 +18,150 @@ Route::get('/home', function () {
 Route::get('/login', function () {
     if (Auth::check()) {
         if (Auth::user()->role === 'penumpang') {
-            return redirect()->route('user.dashboard');
+            return redirect()
+                ->route('user.dashboard');
         }
 
-        if (in_array(Auth::user()->role, ['super_admin', 'admin', 'pimpinan'])) {
+        if (
+            in_array(
+                Auth::user()->role,
+                [
+                    'super_admin',
+                    'admin',
+                    'petugas',
+                    'pimpinan',
+                ],
+                true
+            )
+        ) {
             return redirect('/admin');
         }
     }
 
-    return redirect()->route('user.login');
+    return redirect()
+        ->route('user.login');
 })->name('login');
 
-Route::prefix('user')->name('user.')->group(function () {
-    Route::get('/login', [UserAuthController::class, 'showLogin'])->name('login');
-    Route::post('/login', [UserAuthController::class, 'login'])->name('login.process');
+Route::prefix('user')
+    ->name('user.')
+    ->group(function () {
+        Route::get(
+            '/login',
+            [
+                UserAuthController::class,
+                'showLogin',
+            ]
+        )->name('login');
 
-    Route::get('/register', [UserAuthController::class, 'showRegister'])->name('register');
-    Route::post('/register', [UserAuthController::class, 'register'])->name('register.process');
-});
+        Route::post(
+            '/login',
+            [
+                UserAuthController::class,
+                'login',
+            ]
+        )->name('login.process');
 
-Route::middleware(['auth', 'role:penumpang'])->prefix('user')->name('user.')->group(function () {
-    Route::post('/logout', [UserAuthController::class, 'logout'])->name('logout');
+        Route::get(
+            '/register',
+            [
+                UserAuthController::class,
+                'showRegister',
+            ]
+        )->name('register');
 
-    Route::get('/dashboard', [UserDashboardController::class, 'index'])->name('dashboard');
+        Route::post(
+            '/register',
+            [
+                UserAuthController::class,
+                'register',
+            ]
+        )->name('register.process');
+    });
 
-    Route::get('/profil', [UserProfilController::class, 'edit'])->name('profil.edit');
-    Route::put('/profil', [UserProfilController::class, 'update'])->name('profil.update');
+Route::middleware([
+    'auth',
+    'role:penumpang',
+])
+    ->prefix('user')
+    ->name('user.')
+    ->group(function () {
+        Route::post(
+            '/logout',
+            [
+                UserAuthController::class,
+                'logout',
+            ]
+        )->name('logout');
 
-    Route::get('/pemesanan', [UserPemesananTiketController::class, 'index'])->name('pemesanan.index');
-    Route::get('/pemesanan/create', [UserPemesananTiketController::class, 'create'])->name('pemesanan.create');
-    Route::post('/pemesanan', [UserPemesananTiketController::class, 'store'])->name('pemesanan.store');
-    Route::get('/pemesanan/{pemesanan}', [UserPemesananTiketController::class, 'show'])->name('pemesanan.show');
-    Route::get('/pemesanan/{pemesanan}/edit', [UserPemesananTiketController::class, 'edit'])->name('pemesanan.edit');
-    Route::put('/pemesanan/{pemesanan}', [UserPemesananTiketController::class, 'update'])->name('pemesanan.update');
-});
+        Route::get(
+            '/dashboard',
+            [
+                UserDashboardController::class,
+                'index',
+            ]
+        )->name('dashboard');
+
+        Route::get(
+            '/profil',
+            [
+                UserProfilController::class,
+                'edit',
+            ]
+        )->name('profil.edit');
+
+        Route::put(
+            '/profil',
+            [
+                UserProfilController::class,
+                'update',
+            ]
+        )->name('profil.update');
+
+        Route::get(
+            '/pemesanan',
+            [
+                UserPemesananTiketController::class,
+                'index',
+            ]
+        )->name('pemesanan.index');
+
+        Route::get(
+            '/pemesanan/create',
+            [
+                UserPemesananTiketController::class,
+                'create',
+            ]
+        )->name('pemesanan.create');
+
+        Route::post(
+            '/pemesanan',
+            [
+                UserPemesananTiketController::class,
+                'store',
+            ]
+        )->name('pemesanan.store');
+
+        Route::get(
+            '/pemesanan/{pemesanan}',
+            [
+                UserPemesananTiketController::class,
+                'show',
+            ]
+        )->name('pemesanan.show');
+
+        Route::get(
+            '/pemesanan/{pemesanan}/edit',
+            [
+                UserPemesananTiketController::class,
+                'edit',
+            ]
+        )->name('pemesanan.edit');
+
+        Route::put(
+            '/pemesanan/{pemesanan}',
+            [
+                UserPemesananTiketController::class,
+                'update',
+            ]
+        )->name('pemesanan.update');
+    });

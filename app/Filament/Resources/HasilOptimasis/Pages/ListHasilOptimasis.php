@@ -6,7 +6,6 @@ use App\Filament\Resources\HasilOptimasis\HasilOptimasiResource;
 use App\Models\JadwalKeberangkatan;
 use App\Services\TiketAllocationService;
 use Filament\Actions\Action;
-use Filament\Actions\CreateAction;
 use Filament\Forms\Components\Select;
 use Filament\Notifications\Notification;
 use Filament\Resources\Pages\ListRecords;
@@ -34,13 +33,18 @@ class ListHasilOptimasis extends ListRecords
                 ->modalHeading('Proses Optimasi FCFS')
                 ->modalDescription('Sistem akan memproses alokasi tiket berdasarkan urutan waktu pemesanan paling awal.')
                 ->modalSubmitActionLabel('Proses Sekarang')
-                ->visible(fn (): bool => static::getResource()::canCreate())
+                ->visible(fn (): bool => auth()->user()?->canManageOptimizationData() ?? false)
                 ->action(function (array $data): void {
-                    $hasil = app(TiketAllocationService::class)->process((int) $data['jadwal_id'], 'fcfs');
+                    $hasil = app(TiketAllocationService::class)
+                        ->process((int) $data['jadwal_id'], 'fcfs');
 
                     Notification::make()
                         ->title('Proses FCFS berhasil')
-                        ->body('Load factor: ' . $hasil->load_factor . '%. Tiket diterima: ' . $hasil->total_tiket_diterima . '. Tiket ditolak: ' . $hasil->total_tiket_ditolak . '.')
+                        ->body(
+                            'Load factor: ' . $hasil->load_factor . '%. ' .
+                            'Tiket diterima: ' . $hasil->total_tiket_diterima . '. ' .
+                            'Tiket ditolak: ' . $hasil->total_tiket_ditolak . '.'
+                        )
                         ->success()
                         ->send();
                 }),
@@ -59,20 +63,21 @@ class ListHasilOptimasis extends ListRecords
                 ->modalHeading('Proses Optimasi Greedy Heuristik')
                 ->modalDescription('Sistem akan memproses alokasi tiket berdasarkan prioritas jumlah tiket terbesar yang masih dapat masuk ke kapasitas kapal.')
                 ->modalSubmitActionLabel('Proses Sekarang')
-                ->visible(fn (): bool => static::getResource()::canCreate())
+                ->visible(fn (): bool => auth()->user()?->canManageOptimizationData() ?? false)
                 ->action(function (array $data): void {
-                    $hasil = app(TiketAllocationService::class)->process((int) $data['jadwal_id'], 'greedy');
+                    $hasil = app(TiketAllocationService::class)
+                        ->process((int) $data['jadwal_id'], 'greedy');
 
                     Notification::make()
                         ->title('Proses Greedy berhasil')
-                        ->body('Load factor: ' . $hasil->load_factor . '%. Tiket diterima: ' . $hasil->total_tiket_diterima . '. Tiket ditolak: ' . $hasil->total_tiket_ditolak . '.')
+                        ->body(
+                            'Load factor: ' . $hasil->load_factor . '%. ' .
+                            'Tiket diterima: ' . $hasil->total_tiket_diterima . '. ' .
+                            'Tiket ditolak: ' . $hasil->total_tiket_ditolak . '.'
+                        )
                         ->success()
                         ->send();
                 }),
-
-            CreateAction::make()
-                ->label('Tambah Hasil Optimasi')
-                ->visible(fn (): bool => static::getResource()::canCreate()),
         ];
     }
 

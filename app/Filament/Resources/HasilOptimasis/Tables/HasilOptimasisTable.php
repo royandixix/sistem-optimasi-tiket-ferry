@@ -2,9 +2,6 @@
 
 namespace App\Filament\Resources\HasilOptimasis\Tables;
 
-use Filament\Actions\BulkActionGroup;
-use Filament\Actions\DeleteBulkAction;
-use Filament\Actions\EditAction;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Table;
@@ -118,16 +115,6 @@ class HasilOptimasisTable
                         'fcfs' => 'FCFS',
                         'greedy' => 'Greedy Heuristik',
                     ]),
-            ])
-            ->recordActions([
-                EditAction::make()
-                    ->label('Ubah'),
-            ])
-            ->toolbarActions([
-                BulkActionGroup::make([
-                    DeleteBulkAction::make()
-                        ->label('Hapus Data Terpilih'),
-                ]),
             ])
             ->emptyStateHeading('Belum ada data hasil optimasi')
             ->emptyStateDescription('Pilih tombol Proses FCFS atau Proses Greedy untuk menghasilkan laporan optimasi otomatis.');

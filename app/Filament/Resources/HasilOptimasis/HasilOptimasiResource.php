@@ -2,8 +2,6 @@
 
 namespace App\Filament\Resources\HasilOptimasis;
 
-use App\Filament\Resources\HasilOptimasis\Pages\CreateHasilOptimasi;
-use App\Filament\Resources\HasilOptimasis\Pages\EditHasilOptimasi;
 use App\Filament\Resources\HasilOptimasis\Pages\ListHasilOptimasis;
 use App\Filament\Resources\HasilOptimasis\Schemas\HasilOptimasiForm;
 use App\Filament\Resources\HasilOptimasis\Tables\HasilOptimasisTable;
@@ -46,12 +44,12 @@ class HasilOptimasiResource extends Resource
 
     public static function canCreate(): bool
     {
-        return auth()->user()?->canManageOptimizationData() ?? false;
+        return false;
     }
 
     public static function canEdit(Model $record): bool
     {
-        return auth()->user()?->canManageOptimizationData() ?? false;
+        return false;
     }
 
     public static function canDelete(Model $record): bool
@@ -93,8 +91,6 @@ class HasilOptimasiResource extends Resource
     {
         return [
             'index' => ListHasilOptimasis::route('/'),
-            'create' => CreateHasilOptimasi::route('/create'),
-            'edit' => EditHasilOptimasi::route('/{record}/edit'),
         ];
     }
 }
